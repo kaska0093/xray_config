@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Импорт конфига Xray</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 500px;
+      margin: auto;
+      text-align: center;
+    }
+    h1 { color: #007AFF; }
+    .btn {
+      display: block;
+      margin: 30px auto;
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #007AFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 300px;
+    }
+    .btn:active { background-color: #0056b3; }
+    .info {
+      font-size: 14px;
+      color: #666;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Импорт конфигурации</h1>
+  <p>Нажмите кнопку, чтобы открыть приложение и импортировать настройки.</p>
+
+  <a id="openAppButton" href="#" class="btn">Открыть приложение</a>
+
+  <p class="info">
+    Убедитесь, что приложение установлено.
+  </p>
+
+  <script>
+    // Пример твоего JSON-конфига (замени на реальный)
+    const config = {
+      "log": { "loglevel": "warning" },
+      "inbounds": [
+        {
+          "port": 1080,
+          "protocol": "socks",
+          "settings": { "auth": "noauth" }
+        }
+      ],
+      "outbounds": [
+        {
+          "protocol": "vless",
+          "settings": {
+            "vnext": [
+              {
+                "address": "your-server.com",
+                "port": 443,
+                "users": [
+                  {
+                    "id": "b1234567-89ab-cdef-0123-456789abcdef",
+                    "encryption": "none"
+                  }
+                ]
+              }
+            ]
+          },
+          "streamSettings": {
+            "network": "ws",
+            "security": "tls",
+            "wsSettings": {
+              "path": "/vless",
+              "headers": { "Host": "your-server.com" }
+            }
+          }
+        }
+      ]
+    };
+
+    // Кодируем JSON в base64
+    const encodedConfig = btoa(JSON.stringify(config));
+
+    // 🔁 Выбери одну из схем: myapp:// или xrayvpntunnel://
+    const appScheme = 'myapp://import'; // или 'xrayvpntunnel://import'
+
+    const button = document.getElementById('openAppButton');
+
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      // Формируем URL: myapp://import?config=base64
+      const deepLink = `${appScheme}?config=${encodeURIComponent(encodedConfig)}`;
+
+      // Пытаемся открыть приложение
+      window.location.href = deepLink;
+
+      // Через 1.5 секунды можно показать подсказку, если не открылось
+      setTimeout(() => {
+        alert('Если приложение не открылось, убедитесь, что оно установлено.');
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
